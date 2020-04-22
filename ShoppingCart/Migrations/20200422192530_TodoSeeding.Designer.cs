@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShoppingCart.Data;
 
 namespace ShoppingCart.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200422192530_TodoSeeding")]
+    partial class TodoSeeding
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,7 +232,7 @@ namespace ShoppingCart.Migrations
                         {
                             Id = "00000000-ffff-ffff-ffff-ffffffffffff",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "29dd7061-33d5-493a-9ec8-b96208511d3d",
+                            ConcurrencyStamp = "dd5928bb-22c6-451f-b7dc-caa8c305a0ed",
                             Email = "r@r.com",
                             EmailConfirmed = true,
                             FirstName = "Rose",
@@ -238,7 +240,7 @@ namespace ShoppingCart.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "R@R.COM",
                             NormalizedUserName = "R@R.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAELoY6+5Npn21VO/jvDoyPB4KwqwKyP7grf+lWVbn2OlbYQtERL7mE8qxY0dJvMbstA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEB/AybpCC+I2LEzl3ggQDJbv91GChidf2uq5wz5S7jtDSNUFggIU6hIH03UiSMMZxQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "7f434309-a4d9-48e9-9ebb-8803db794577",
                             TwoFactorEnabled = false,
@@ -305,18 +307,18 @@ namespace ShoppingCart.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("TodoStatusId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TodoStatusId")
+                    b.Property<int?>("TodoStatusId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("TodoStatusId");
+                    b.HasIndex("TodoStatusId1");
 
                     b.ToTable("TodoItem");
                 });
@@ -423,9 +425,7 @@ namespace ShoppingCart.Migrations
 
                     b.HasOne("ShoppingCart.Models.TodoStatus", "TodoStatus")
                         .WithMany()
-                        .HasForeignKey("TodoStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TodoStatusId1");
                 });
 #pragma warning restore 612, 618
         }

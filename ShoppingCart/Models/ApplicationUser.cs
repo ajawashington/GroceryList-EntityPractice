@@ -13,5 +13,8 @@ namespace ShoppingCart.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public List<ShoppingItem> ShoppingItems { get; set; }
+
+        public List<TodoItem> TodoItems { get; set; }
     }
+
 }

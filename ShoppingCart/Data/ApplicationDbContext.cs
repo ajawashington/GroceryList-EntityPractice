@@ -17,6 +17,8 @@ namespace ShoppingCart.Data
 
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<ShoppingItem> ShoppingItem { get; set; }
+
+        public DbSet<TodoStatus> TodoStatus { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -57,19 +59,42 @@ namespace ShoppingCart.Data
                     ApplicationUserId = "00000000-ffff-ffff-ffff-ffffffffffff"
                 },
                 new ShoppingItem()
-                 {
-                     Id = 3,
-                     ProductName = "Eggs",
-                     ApplicationUserId = "00000000-ffff-ffff-ffff-ffffffffffff"
-                 },
+                {
+                    Id = 3,
+                    ProductName = "Eggs",
+                    ApplicationUserId = "00000000-ffff-ffff-ffff-ffffffffffff"
+                },
                  new ShoppingItem()
-                  {
-                      Id = 4,
-                      ProductName = "Mask",
-                      ApplicationUserId = "00000000-ffff-ffff-ffff-ffffffffffff"
-                  }
+                 {
+                     Id = 4,
+                     ProductName = "Mask",
+                     ApplicationUserId = "00000000-ffff-ffff-ffff-ffffffffffff"
+                 });
 
+
+                   //Create shopping items 
+            TodoStatus status = new TodoStatus
+            {
+                Id = 1,
+                Title = "Todo"
+            };
+            modelBuilder.Entity<TodoStatus>().HasData(status);
+
+            modelBuilder.Entity<TodoStatus>().HasData(
+                new TodoStatus()
+                {
+                    Id = 2,
+                    Title = "In Progress"
+  
+                },
+                new TodoStatus()
+                {
+                    Id = 3,
+                    Title = "Done"
+
+                }
                  );
         }
+        public DbSet<ShoppingCart.Models.TodoItem> TodoItem { get; set; }
     }
 }
