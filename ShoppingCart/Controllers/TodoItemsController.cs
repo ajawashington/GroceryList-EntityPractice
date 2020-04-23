@@ -24,43 +24,59 @@ namespace ShoppingCart.Controllers
             _userManager = userManager;
         }
 
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
+
 
         // GET: TodoItems
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult> Index(string filter)
         {
 
             var user = await GetCurrentUserAsync();
-            var items = await _context.TodoItem
-                .Where(si => si.ApplicationUserId == user.Id)
-                .ToListAsync();
 
-            return View(items);
 
+            var items = _context.TodoItem
+          .Where(si => si.ApplicationUserId == user.Id);
+       
+            if (filter == "To-Do")
+            {
+                items = items.Where(tdi => tdi.TodoStatusId == 1)
+                 .Include(ti => ti.TodoStatus);
+
+
+                return View(items);
+            }
+            else if (filter == "In Progress")
+            {
+
+                items = items.Where(ti => ti.TodoStatusId == 2)
+                    .Include(ti => ti.TodoStatus);
+
+                return View(items);
+            }
+            else if (filter == "Done")
+            {
+                items = items.Where(ti => ti.TodoStatusId == 3)
+                    .Include(ti => ti.TodoStatus);
+
+                return View(items);
+            }
+            else
+            {
+                items = items.Include(tdi => tdi.TodoStatus);
+                return View(items);
+            }
         }
 
         // GET: TodoItems/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var todoItem = await _context.TodoItem
-        //        .Include(t => t.ApplicationUser)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (todoItem == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View();
-        //}
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
 
         // GET: TodoItems/Create
         public IActionResult Create()
         {
-     
+            ViewData["TodoStatusId"] = new SelectList(_context.TodoStatus, "Id", "Title");
             return View();
         }
 
@@ -76,9 +92,9 @@ namespace ShoppingCart.Controllers
                 var user = await GetCurrentUserAsync();
                 todoItem.ApplicationUserId = user.Id;
 
-                   var status = await _context.TodoStatus
-                .Where(si => si.Id == todoItem.TodoStatusId)
-                .ToListAsync();
+                var status = await _context.TodoStatus
+             .Where(si => si.Id == todoItem.TodoStatusId)
+             .ToListAsync();
 
                 _context.TodoItem.Add(todoItem);
                 await _context.SaveChangesAsync();
@@ -87,98 +103,58 @@ namespace ShoppingCart.Controllers
             }
             catch
             {
-                
+
                 return View();
             }
         }
 
         // GET: TodoItems/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var todoItem = await _context.TodoItem.FindAsync(id);
-        //    if (todoItem == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "Id", todoItem.ApplicationUserId);
-        //    return View(todoItem);
-        //}
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
 
         // POST: TodoItems/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,TodoStatusId,ApplicationUserId")] TodoItem todoItem)
-        //{
-        //    if (id != todoItem.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(todoItem);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!TodoItemExists(todoItem.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "Id", todoItem.ApplicationUserId);
-        //    return View(todoItem);
-        //}
-
-        // GET: TodoItems/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public ActionResult Edit(int id, IFormCollection collection)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
-            }
+                // TODO: Add update logic here
 
-            var todoItem = await _context.TodoItem
-                .Include(t => t.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (todoItem == null)
+                return RedirectToAction(nameof(Index));
+            }
+            catch
             {
-                return NotFound();
+                return View();
             }
+        }
 
-            return View(todoItem);
+        public async Task<ActionResult> Delete(int id)
+        {
+            var item = await _context.TodoItem.Include(i => i.TodoStatus).FirstOrDefaultAsync(i => i.Id == id);
+
+            return View(item);
         }
 
         // POST: TodoItems/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<ActionResult> Delete(int id, TodoItem toDoItem)
         {
-            var todoItem = await _context.TodoItem.FindAsync(id);
-            _context.TodoItem.Remove(todoItem);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            try
+            {
 
-        private bool TodoItemExists(int id)
-        {
-            return _context.TodoItem.Any(e => e.Id == id);
+                _context.TodoItem.Remove(toDoItem);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
         }
-        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
     }
-}
+    }
